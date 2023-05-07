@@ -30,6 +30,12 @@
     v-divider
     //-> Custom Navigation
     v-list.py-2(v-if='currentMode === `custom`', dense, :class='color', :dark='dark')
+      v-list-item(
+        :href='profileLink'
+        )
+        v-list-item-avatar(size='24', tile)
+          v-icon {{ 'mdi-account-edit' }}
+        v-list-item-title {{ 'Mein Profil' }}
       template(v-for='item of items')
         v-list-item(
           v-if='item.k === `link`'
@@ -106,6 +112,17 @@ export default {
     }
   },
   computed: {
+    profileLink() {
+      const regexUser = /\(([0-9]{2}[a-z]{1,7})\)$/gm
+      const username = this.$store.get('user/name')
+      let m
+
+      if ((m = regexUser.exec(username)) !== null) {
+        return `/e/user/${m[1]}`
+      } else {
+        return 'abc'
+      }
+    },
     path: get('page/path'),
     locale: get('page/locale')
   },
