@@ -202,6 +202,10 @@
                 //-   template(v-slot:activator='{ on }')
                 //-     v-btn(icon, tile, v-on='on', :aria-label='$t(`common:page.bookmark`)'): v-icon(color='grey') mdi-bookmark
                 //-   span {{$t('common:page.bookmark')}}
+                v-tooltip(bottom)
+                  template(v-slot:activator='{ on }')
+                    v-btn(icon, tile, v-on='on', @click='', ref="copyPermalinkBtn" :aria-label='$t(`common:page.bookmark`)'): v-icon(color='grey') mdi-link
+                  span {{$t('common:page.permalink')}}
                 v-menu(offset-y, bottom, min-width='300')
                   template(v-slot:activator='{ on: menu }')
                     v-tooltip(bottom)
@@ -602,6 +606,33 @@ export default {
     this.$store.set('page/mode', 'view')
   },
   mounted () {
+    // copy permalink to clipboard
+    const clip = new ClipboardJS(this.$refs.copyPermalinkBtn.$el, {
+      text: () => {
+        let pageID = this.$store.get('page/id')
+        if (pageID) {
+          let url = new URL(window.location.href)
+          url.pathname = `i/${pageID}`
+          return String(url)
+        }
+      }
+    })
+
+    clip.on('success', () => {
+      this.$store.commit('showNotification', {
+        style: 'success',
+        message: `Permalink copied successfully`,
+        icon: 'content-copy'
+      })
+    })
+    clip.on('error', () => {
+      this.$store.commit('showNotification', {
+        style: 'red',
+        message: `Failed to copy to clipboard`,
+        icon: 'alert'
+      })
+    })
+
     if (this.$vuetify.theme.dark) {
       this.scrollStyle.bar.background = '#424242'
     }
