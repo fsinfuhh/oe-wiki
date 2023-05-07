@@ -606,6 +606,18 @@ export default {
     this.$store.set('page/mode', 'view')
   },
   mounted () {
+    // redirect
+    let contenttext = document.querySelector('.contents').innerText
+    const redirectRegex = /^#REDIRECT (.*)/
+    let match = contenttext.match(redirectRegex)
+    if (match) {
+      const redirect = match[1]
+
+      const queryString = window.location.search
+      const urlParams = new URLSearchParams(queryString)
+      if (urlParams.get('redirect') !== 'no') window.location = `/${redirect}`
+    }
+
     // copy permalink to clipboard
     const clip = new ClipboardJS(this.$refs.copyPermalinkBtn.$el, {
       text: () => {
